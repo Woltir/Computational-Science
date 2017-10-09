@@ -1,0 +1,8 @@
+Exercises repartition :
+
+Exercise 1 : Marin
+Exercise 2 : Bastien
+Exercise 3 : Brahim & Mathieu
+
+Thank to register the scripts as follow : hmwk3_ex_x.py
+where x is a random variable that takes its values between exercise min and exercise max (e.g : x = 1, 2, 3)
