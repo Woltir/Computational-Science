@@ -32,11 +32,12 @@ def trajectory(nstep, step) :
             # accceptance by one
             traj[i+1] = x, y
             acceptance += 1
-            if in_circle : circlecompt += 1
+            # if the move is in the circle, add 4
+            if in_circle(x, y) : circlecompt += 4
         else :
             # else, stays here 
             traj[i+1] = x0, y0
-    return traj, acceptance/float(nstep), circlecompt
+    return traj, acceptance, circlecompt
 
 ### Question 1 :
 step = 1.
@@ -56,14 +57,62 @@ ax[1, 1].set_title('n = ' + str(N[3]))
 plt.show()
 
 ### Question 2 :
-S = np.linspace(0.1, 2., num = 100) # list of steps between 0.01 and 5.
-nstep = 10**4
+S = np.linspace(1., 1.5, num = 100) # list of steps between 0.01 and 5.
+nstep = 10**3
 T = [trajectory(nstep, S[i]) for i in range(len(S))]
 
-A = np.array([T[i][1] for i in range(len(S))]) # acceptance list
+A = np.array([T[i][1]/float(nstep) for i in range(len(S))]) # acceptance list
 
 # print the best(s) empricial 1/2 step 
 print 'The best empirical 1/2 step size is step = ' + str( S[np.argmin(abs(A - 0.5))])
 plt.plot(S, A) ; plt.title('Acceptance ratio vs space step') ; plt.show()
 
 ### Question 3 :
+step = 1.17
+nstep = 10**3
+repeat = 100
+T2 = [trajectory(nstep, step) for i in range(repeat)]
+acceptance = [T2[i][1] for i in range(repeat)]
+estim = [T2[i][2] for i in range(repeat)]
+plt.plot(np.array(estim, dtype = float)/acceptance) ; plt.show()
+
+### Question 4 :
+def bunch(data) :
+    D = []
+    for i in range(len(data)/2) :
+        D.append(0.5*(data[2*i] + data[ int((2*i+1)) ]))
+    return np.array(D)
+
+fig2, ax2 = plt.subplots(1, 2)
+
+n=14
+nstep= 2**n
+D = {}
+T1 = trajectory(nstep, step)
+D[0] = T1[0]
+M1, V1 = np.zeros(n), np.zeros(n)
+M1[0], V1[0] = np.mean(D[0]), np.var(D[0])
+
+for i in range(1,n) :
+    D[i] = bunch(D[i-1])
+    M1[i], V1[i] = np.mean(D[i]), np.var(D[i])
+
+ax2[0].plot(M1, label = 'step  =' + str(step))
+ax2[1].plot(V1, label = 'step  =' + str(step))
+
+step = 0.1
+D3 = {}
+T3 = trajectory(nstep, step)
+D3[0] = T3[0]
+
+M3, V3 = np.zeros(n), np.zeros(n)
+M3[0], V3[0] = np.mean(D3[0]), np.var(D3[0])
+
+for i in range(1,n) :
+    D3[i] = bunch(D3[i-1])
+    M3[i], V3[i] = np.mean(D3[i]), np.var(D3[i])
+
+ax2[0].plot(M3, label = 'step  =' + str(step))
+ax2[1].plot(V3, label = 'step  =' + str(step))
+plt.legend()
+plt.show()
