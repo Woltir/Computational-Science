@@ -16,7 +16,8 @@ def trajectory(nstep, step) :
     step_x, step_y  = step, step          # define step size for x, y
     acceptance = 0 #initialize acceptance
     for i in range(nstep-1) :
-        # propose a move :
+        # propose a move between :
+        # x +/- dx, with dx a r.v. in [-step, step]
         dx, dy  = (2*step_x*random()) - step_x, (2*step_y*random()) - step_y
         x, y    = traj[i, 0] + dx , traj[i, 1] + dy     # move
         if in_square(x, y) :
@@ -27,10 +28,10 @@ def trajectory(nstep, step) :
         else :
             # else, stays here
             traj[i+1] = traj[i]
-    return traj, acceptance
+    return traj, acceptance/float(nstep)
 
 #Question 1 :
-step = 0.1
+step = 1.1
 N = [100, 1000, 4000, 20000]
 T = [trajectory(N[i], step) for i in range(len(N))]
 
@@ -47,9 +48,12 @@ ax[1, 1].set_title('n = ' + str(N[3]))
 plt.show()
 
 #Question 2 :
-S = np.linspace(0.01, 1., num = 50)
-nstep = 10**4
+S = np.linspace(0.01, 2., num = 100) # list of steps between 0.01 and 2.
+nstep = 10**3
 T = [trajectory(nstep, S[i]) for i in range(len(S))]
 
-A = np.array([T[i][1] for i in range(len(S))])
-plt.plot(S, A/float(nstep)) ; plt.title('Acceptance ratio vs space step') ; plt.show()
+A = np.array([T[i][1] for i in range(len(S))]) # acceptance list
+
+# print the best(s) empricial 1/2 step 
+print 'The best empirical 1/2 step size is step = ' + str( S[np.argwhere(abs(A - 0.5) <= 0.01 )])
+plt.plot(S, A) ; plt.title('Acceptance ratio vs space step') ; plt.show()
